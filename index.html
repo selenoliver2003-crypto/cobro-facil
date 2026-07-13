@@ -4,24 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cobro Fácil</title>
-    <!-- Tu icono -->
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
         h1 { text-align: center; color: #1b5e20; margin-bottom: 20px; }
         h3 { color: #333; margin-top: 5px; border-bottom: 2px solid #1b5e20; padding-bottom: 5px; }
-        .card { background: white; padding: 15px; border-radius: 15px; margin-top: 15px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+        .card { background: white; padding: 15px; border-radius: 15px; margin-top: 15px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
         input { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
         button { padding: 14px; border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
         .btn-guardar { background: #1b5e20; width: 100%; }
-        .btn-cobrar { background: #25D366; padding: 10px 18px; border-radius: 8px; font-size: 15px; font-weight: bold; margin-left: 10px; }
-        .btn-eliminar { background: #c62828; padding: 10px 14px; font-size: 15px; border-radius: 8px; margin-left: 5px; }
+        .btn-cobrar { background: #25D366; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: bold; margin-right: 5px; }
+        .btn-reiniciar-principal { background: #ff9800; padding: 8px 12px; font-size: 14px; border-radius: 8px; margin-right: 5px; font-weight: bold; }
+        .btn-eliminar { background: #c62828; padding: 8px 12px; font-size: 14px; border-radius: 8px; }
+        
+        .btn-check-individual { background: #2e7d32; padding: 6px 12px; font-size: 12px; border-radius: 6px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; border: none; color: white; margin-top: 5px; }
+        
         ul { list-style: none; padding: 0; }
-        li { background: #eee; padding: 12px; margin-top: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; }
-        .info-cliente { flex-grow: 1; }
-        .botones { display: flex; }
+        
+        /* Bloque contenedor de cada cliente (Tarjeta individualizada) */
+        .cliente-card { 
+            background: white; 
+            padding: 18px; 
+            margin-top: 18px; 
+            border-radius: 16px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+            border: 1px solid #e0e0e0; 
+        }
+        
+        .fila-principal { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        
+        /* El bloque de info se comporta como botón y cambia de color al tocarlo */
+        .info-cliente { 
+            flex-grow: 1; 
+            cursor: pointer; 
+            padding: 8px; 
+            border-radius: 10px; 
+            transition: background 0.2s, transform 0.1s; 
+        }
+        .info-cliente:active { 
+            background: #e8f5e9; 
+            transform: scale(0.98); 
+        }
+        
+        .historial-titulo { font-size: 11px; color: #555; font-weight: bold; margin-top: 15px; text-transform: uppercase; border-top: 1px solid #eee; padding-top: 10px; }
+        .historial-lista { padding: 0; margin: 5px 0 0 0; list-style: none; }
+        .historial-item { background: #f9f9f9; padding: 10px 12px; margin-top: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border-left: 4px solid #ccc; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        
+        /* El cuadro de cobro pendiente cambia de color al presionarlo e indica interactividad */
+        .item-pendiente { 
+            border-left-color: #c62828; 
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .item-pendiente:active {
+            background: #ffebee;
+            transform: scale(0.99);
+        }
+
+        .item-pagado { border-left-color: #2e7d32; background: #e8f5e9; }
+        .tag-pendiente { color: #c62828; font-weight: bold; font-size: 11px; }
+        .tag-pagado { color: #2e7d32; font-weight: bold; font-size: 11px; }
+        
+        .botones { display: flex; align-items: center; }
         #buscador { background: #e8f5e9; border: 2px solid #2e7d32; font-weight: bold; }
+        #monto-input { border: 2px solid #25D366; font-weight: bold; color: #1b5e20; }
     </style>
 </head>
 <body>
@@ -31,7 +80,6 @@
     <div class="card">
         <h3>👥 Agregar Cliente</h3>
         <input id="nuevo-nombre" placeholder="Nombre del cliente">
-        <!-- CAMBIADO A type="tel" PARA QUE DEJE PEGAR CUALQUIER NÚMERO -->
         <input id="nuevo-telefono" type="tel" placeholder="Número (ej: 59176616889)">
         <button class="btn-guardar" onclick="guardarCliente()">+ Agregar a la Agenda</button>
     </div>
@@ -39,6 +87,7 @@
     <div class="card">
         <h3>📋 Buscar y Cobrar</h3>
         <input id="buscador" type="text" placeholder="🔍 Escribe para buscar cliente..." oninput="actualizarVistas()">
+        <input id="monto-input" type="number" placeholder="Monto a cobrar (ej: 50)">
         <ul id="lista-clientes"></ul>
     </div>
 
@@ -54,21 +103,67 @@
             clientesFiltrados.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
             if (clientesFiltrados.length === 0) {
-                lista.innerHTML = '<li style="background:none; color:#777; justify-content:center;">No se encontraron clientes.</li>';
+                lista.innerHTML = '<li style="background:none; color:#777; text-align:center; box-shadow:none;">No se encontraron clientes.</li>';
                 return;
             }
 
             clientesFiltrados.forEach((c, index) => {
                 let originalIndex = clientes.indexOf(c);
+                let deudas = c.deudas || [];
+                
+                let pendientes = deudas.filter(d => !d.pagado).length;
+                let estadoResumen = pendientes > 0 ? `Pendiente: ${pendientes} cobro(s) ⏳` : 'Al día 🎉';
+                let colorResumen = pendientes > 0 ? '#c62828' : '#2e7d32';
+
+                let historialHTML = '';
+                if (deudas.length > 0) {
+                    historialHTML = `
+                        <div class="historial-titulo">Cobros Registrados:</div>
+                        <ul class="historial-lista">
+                            ${deudas.map((deuda, i) => {
+                                let claseItem = deuda.pagado ? 'item-pagado' : 'item-pendiente';
+                                
+                                // Si está pendiente, al hacer clic en el cuadro te lleva directo al chat.
+                                // Usamos event.stopPropagation() en el botón de pago para que al presionarlo NO se abra el chat de WhatsApp.
+                                let accionClick = !deuda.pagado ? `onclick="verificarChat('${c.telefono}')"` : '';
+
+                                return `
+                                    <li class="historial-item ${claseItem}" ${accionClick} title="${!deuda.pagado ? 'Toca este cuadro para verificar comprobante en WhatsApp' : ''}">
+                                        <div>
+                                            <b>Cobro #${i+1}:</b> ${deuda.fecha} <br>
+                                            <b>Monto:</b> Bs ${deuda.monto} <br>
+                                            ${deuda.pagado ? `<span class="tag-pagado">Pagado 🎉</span>` : `<span class="tag-pendiente">Pendiente ⏳ (Toca para ver chat)</span>`}
+                                        </div>
+                                        <div>
+                                            ${!deuda.pagado 
+                                                ? `<button class="btn-check-individual" onclick="event.stopPropagation(); marcarDeudaPagada(${originalIndex}, ${i})">✔ Pagó</button>` 
+                                                : ''
+                                            }
+                                        </div>
+                                    </li>
+                                `;
+                            }).join('')}
+                        </ul>
+                    `;
+                }
+
                 let li = document.createElement("li");
+                li.className = "cliente-card";
                 li.innerHTML = `
-                    <div class="info-cliente">
-                        <b>${c.nombre}</b> <span style="color:#555; font-size:14px;">(${c.telefono})</span>
+                    <div class="fila-principal">
+                        <div class="info-cliente" onclick="verificarChat('${c.telefono}')" title="Toca para ir a su chat">
+                            <b>${c.nombre}</b> <span style="color:#555; font-size:14px;">(${c.telefono})</span><br>
+                            <span style="font-size: 12px; color: ${colorResumen}; font-weight: bold; margin-top: 4px; display: inline-block;">
+                                ${estadoResumen}
+                            </span>
+                        </div>
+                        <div class="botones">
+                            <button class="btn-cobrar" onclick="registrarCobro(${originalIndex}, '${c.telefono}', '${c.nombre}')">Cobrar</button>
+                            <button class="btn-reiniciar-principal" title="Limpiar historial completo (Ya pagó todo)" onclick="reiniciarHistorialCompleto(${originalIndex})">🔄</button>
+                            <button class="btn-eliminar" onclick="eliminarCliente(${originalIndex})">X</button>
+                        </div>
                     </div>
-                    <div class="botones">
-                        <button class="btn-cobrar" onclick="abrirChat('${c.telefono}')">Cobrar</button>
-                        <button class="btn-eliminar" onclick="eliminarCliente(${originalIndex})">X</button>
-                    </div>
+                    ${historialHTML}
                 `;
                 lista.appendChild(li);
             });
@@ -76,28 +171,66 @@
 
         function guardarCliente() {
             let nombre = document.getElementById("nuevo-nombre").value.trim();
-            // Limpiamos el teléfono por si pegas algo con espacios o signos como "+" o "-"
-            let telefono = document.getElementById("nuevo-telefono").value.replace(/\s+/g, '').replace(/\+/g, '').trim();
+            let telInput = document.getElementById("nuevo-telefono").value.replace(/\s+/g, '').replace(/\+/g, '').trim();
             
-            if(nombre === "" || telefono === "") { alert("Llena nombre y número."); return; }
+            if(nombre === "" || telInput === "") { alert("Llena nombre y número."); return; }
             
-            clientes.push({ nombre: nombre, telefono: telefono });
+            clientes.push({ nombre: nombre, telefono: telInput, deudas: [] });
             localStorage.setItem('agenda_cobros', JSON.stringify(clientes));
             document.getElementById("nuevo-nombre").value = "";
             document.getElementById("nuevo-telefono").value = "";
             actualizarVistas();
         }
 
-        function eliminarCliente(index) {
-            if(confirm("¿Eliminar a este cliente?")) {
-                clientes.splice(index, 1);
+        function registrarCobro(index, telefono, nombre) {
+            let montoInputEl = document.getElementById("monto-input");
+            let monto = montoInputEl.value.trim();
+            
+            if (monto === "" || parseFloat(monto) <= 0) {
+                alert("¡Por favor, escribe un monto válido antes de cobrar!");
+                return;
+            }
+
+            let ahora = new Date();
+            let fechaTexto = ahora.toLocaleDateString() + ' ' + ahora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            if(!clientes[index].deudas) { clientes[index].deudas = []; }
+            
+            clientes[index].deudas.push({ fecha: fechaTexto, pagado: false, monto: monto });
+
+            localStorage.setItem('agenda_cobros', JSON.stringify(clientes));
+            
+            montoInputEl.value = "";
+            actualizarVistas();
+            
+            let mensaje = nombre + ", son Bs " + monto;
+            window.open("https://wa.me/" + telefono + "?text=" + encodeURIComponent(mensaje), '_blank');
+        }
+
+        function verificarChat(telefono) {
+            window.open("https://wa.me/" + telefono, '_blank');
+        }
+
+        function marcarDeudaPagada(cIndex, dIndex) {
+            clientes[cIndex].deudas[dIndex].pagado = true;
+            localStorage.setItem('agenda_cobros', JSON.stringify(clientes));
+            actualizarVistas();
+        }
+
+        function reiniciarHistorialCompleto(index) {
+            if(confirm("¿Quieres limpiar todo el historial de cobros de este cliente? Esto borrará todos sus registros anteriores para empezar de cero.")) {
+                clientes[index].deudas = [];
                 localStorage.setItem('agenda_cobros', JSON.stringify(clientes));
                 actualizarVistas();
             }
         }
 
-        function abrirChat(telefono) {
-            window.open("https://wa.me/" + telefono, '_blank');
+        function eliminarCliente(index) {
+            if(confirm("¿Eliminar cliente?")) {
+                clientes.splice(index, 1);
+                localStorage.setItem('agenda_cobros', JSON.stringify(clientes));
+                actualizarVistas();
+            }
         }
 
         actualizarVistas();
