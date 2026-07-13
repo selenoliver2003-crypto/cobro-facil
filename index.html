@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cobro Fácil</title>
-    
-    <!-- CONEXIÓN CON TU IMAGEN DE ICONO -->
+    <!-- Tu icono -->
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
-    
     <style>
         body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
         h1 { text-align: center; color: #1b5e20; margin-bottom: 20px; }
@@ -30,15 +28,14 @@
 
     <h1>💰 Cobro Fácil</h1>
 
-    <!-- FORMULARIO PARA AGREGAR -->
     <div class="card">
         <h3>👥 Agregar Cliente</h3>
         <input id="nuevo-nombre" placeholder="Nombre del cliente">
-        <input id="nuevo-telefono" type="number" placeholder="Número (ej: 59176616889)">
+        <!-- CAMBIADO A type="tel" PARA QUE DEJE PEGAR CUALQUIER NÚMERO -->
+        <input id="nuevo-telefono" type="tel" placeholder="Número (ej: 59176616889)">
         <button class="btn-guardar" onclick="guardarCliente()">+ Agregar a la Agenda</button>
     </div>
 
-    <!-- BUSCADOR Y LISTA -->
     <div class="card">
         <h3>📋 Buscar y Cobrar</h3>
         <input id="buscador" type="text" placeholder="🔍 Escribe para buscar cliente..." oninput="actualizarVistas()">
@@ -53,7 +50,6 @@
             let filtro = document.getElementById("buscador").value.toLowerCase();
             lista.innerHTML = '';
             
-            // Filtrar clientes
             let clientesFiltrados = clientes.filter(c => c.nombre.toLowerCase().includes(filtro));
             clientesFiltrados.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
@@ -63,7 +59,6 @@
             }
 
             clientesFiltrados.forEach((c, index) => {
-                // Encontrar el índice original para borrar correctamente
                 let originalIndex = clientes.indexOf(c);
                 let li = document.createElement("li");
                 li.innerHTML = `
@@ -81,7 +76,9 @@
 
         function guardarCliente() {
             let nombre = document.getElementById("nuevo-nombre").value.trim();
-            let telefono = document.getElementById("nuevo-telefono").value.trim();
+            // Limpiamos el teléfono por si pegas algo con espacios o signos como "+" o "-"
+            let telefono = document.getElementById("nuevo-telefono").value.replace(/\s+/g, '').replace(/\+/g, '').trim();
+            
             if(nombre === "" || telefono === "") { alert("Llena nombre y número."); return; }
             
             clientes.push({ nombre: nombre, telefono: telefono });
