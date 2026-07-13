@@ -2,15 +2,93 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cobro Fácil</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f4f4f4;
+margin:0;
+padding:20px;
+}
+
+h1{
+text-align:center;
+color:#1b5e20;
+}
+
+.card{
+background:white;
+padding:15px;
+border-radius:15px;
+margin-top:20px;
+box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:10px;
+border:1px solid #ccc;
+box-sizing:border-box;
+}
+
+button{
+width:100%;
+margin-top:15px;
+padding:14px;
+border:none;
+border-radius:12px;
+background:#25D366;
+color:white;
+font-size:18px;
+}
+
+#resultado{
+margin-top:20px;
+font-weight:bold;
+}
+</style>
+
 </head>
+
 <body>
+
 <h1>💰 Cobro Fácil</h1>
 
-<p>¡Bienvenida!</p>
+<div class="card">
 
-<button>Cobrar</button>
+<label>Nombre del cliente</label>
+<input id="cliente" placeholder="Ej. Juan">
+
+<label>Monto</label>
+<input id="monto" placeholder="Ej. 9">
+
+<button onclick="crear()">Preparar Cobro</button>
+
+<div id="resultado"></div>
+
+</div>
+
+<script>
+
+function crear(){
+
+let nombre=document.getElementById("cliente").value;
+
+let monto=document.getElementById("monto").value;
+
+document.getElementById("resultado").innerHTML=
+
+"✅ Cobro preparado para <b>"+nombre+
+"</b><br><br>Monto: Bs. "+monto+
+"<br><br>En la siguiente versión abriremos automáticamente WhatsApp.";
+
+}
+
+</script>
 
 </body>
 </html>
